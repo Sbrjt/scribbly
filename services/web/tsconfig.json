@@ -1,0 +1,27 @@
+{
+  "extends": [
+    "../../tsconfig.base.json",
+    "@tsconfig/next/tsconfig.json",
+  ],
+  "compilerOptions": {
+    "target": "esnext",
+    "jsx": "react-jsx",
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ]
+    },
+    "rootDir": ".",
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+  ],
+  "references": [
+    {
+      "path": "../../packages/common"
+    }
+  ]
+}

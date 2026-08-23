@@ -1,0 +1,36 @@
+{
+  "name": "auth",
+  "type": "module",
+  "scripts": {
+    "build": "tsc && tsc-alias",
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.js"
+  },
+  "packageManager": "pnpm@10.33.2",
+  "dependencies": {
+    "@app/common": "workspace:*",
+    "@fastify/autoload": "^6.4.0",
+    "@fastify/cookie": "^11.1.2",
+    "@fastify/jwt": "^10.2.0",
+    "@fastify/swagger": "^9.3.0",
+    "@fastify/swagger-ui": "^5.0.0",
+    "@fastify/type-provider-json-schema-to-ts": "^5.0.0",
+    "argon2": "^0.45.1",
+    "close-with-grace": "^2.5.0",
+    "dotenv": "^17.4.2",
+    "fastify": "^5.10.0",
+    "fastify-type-provider-zod": "^7.0.0",
+    "ms": "^2.1.3",
+    "pg": "^8.22.0",
+    "rabbitmq-client": "^5.0.8",
+    "redis": "^4.7.0",
+    "redis-om": "^0.4.7",
+    "reflect-metadata": "^0.2.2",
+    "typeorm": "^0.3.20",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/ms": "^2.1.0",
+    "@types/pg": "^8.20.0"
+  }
+}

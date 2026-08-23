@@ -1,0 +1,9 @@
+packages:
+  - 'services/*'
+  - 'packages/*'
+confirmModulesPurge: false
+ignoredBuiltDependencies:
+  - sharp
+  - unrs-resolver
+trustLockfile: true
+dangerouslyAllowAllBuilds: true

@@ -1,0 +1,27 @@
+{
+    "extends": "@tsconfig/recommended/tsconfig.json",
+    "compilerOptions": {
+        "target": "ESNext",
+        "module": "ESNext",
+        "moduleResolution": "bundler",
+        "rootDir": "${configDir}/src",
+        "outDir": "${configDir}/.dist",
+        "declarationMap": true,
+        "composite": true,
+        "tsBuildInfoFile": "${configDir}/.dist/tsconfig.tsbuildinfo",
+        "useUnknownInCatchVariables": false,
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        "paths": {
+            "@/*": [
+                "${configDir}/src/*"
+            ],
+            "@app/common": [
+                "${configDir}/../../packages/common/src"
+            ]
+        }
+    },
+    "include": [
+        "${configDir}/src"
+    ],
+}

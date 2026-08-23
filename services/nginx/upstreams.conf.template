@@ -1,0 +1,15 @@
+upstream auth_service {
+    server auth-service:${AUTH_SERVICE_PORT};
+}
+
+upstream user_service {
+    server user-service:${USER_SERVICE_PORT};
+}
+
+upstream post_service {
+    server post-service:${POST_SERVICE_PORT};
+}
+
+upstream web {
+    server web:${WEB_PORT};
+}

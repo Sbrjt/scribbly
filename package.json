@@ -1,0 +1,28 @@
+{
+  "name": "app",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "packageManager": "pnpm@11.22.0",
+  "scripts": {
+    "dev": "pnpm -r --parallel --stream run dev",
+    "build": "pnpm -r build",
+    "db:push": "drizzle-kit push"
+  },
+  "devDependencies": {
+    "@tsconfig/recommended": "^1.0.13",
+    "@types/express": "^5.0.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/ms": "^2.1.0",
+    "@types/node": "^26.1.1",
+    "@types/pg": "^8.20.0",
+    "dotenv": "^17.4.2",
+    "drizzle-kit": "^0.31.10",
+    "npm-check": "^6.0.1",
+    "pino-pretty": "^13.1.3",
+    "tsc-alias": "^1.9.1",
+    "tsx": "^4.23.1",
+    "typescript": "^7.0.2",
+    "typesync": "^0.14.3"
+  }
+}
