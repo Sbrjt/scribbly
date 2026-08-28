@@ -1,4 +1,4 @@
-import { toJsonPlugin } from '@app/common/src/mongoose'
+import { toJsonPlugin } from '@app/common'
 import mongoose from 'mongoose'
 import castAggregation from 'mongoose-cast-aggregation'
 import { config } from './config'

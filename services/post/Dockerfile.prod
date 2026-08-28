@@ -1,0 +1,23 @@
+FROM node:lts-alpine AS build
+RUN corepack enable
+WORKDIR /app
+
+COPY pnpm-workspace.yaml pnpm-lock.yaml package.json ./
+COPY packages/common/package.json ./packages/common/
+COPY services/post/package.json ./services/post/
+
+RUN --mount=type=cache,id=pnpm,target=/app/.pnpm-store \
+    pnpm config set store-dir /app/.pnpm-store && \
+    pnpm install --frozen-lockfile
+
+COPY . .
+
+RUN pnpm --filter post... run build
+RUN pnpm -F post deploy --prod --legacy /prod/post
+
+
+FROM node:lts-alpine AS runner
+WORKDIR /app
+ENV NODE_ENV=production
+COPY --from=build /prod/post ./
+CMD ["node", ".dist/index.mjs"]

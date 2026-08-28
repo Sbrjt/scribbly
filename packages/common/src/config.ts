@@ -1,4 +1,4 @@
-// Note: This file is unused right now
+/* // Note: This file is unused right now
 import { findWorkspaceDir } from '@pnpm/find-workspace-dir'
 import dotenv from 'dotenv'
 import path from 'path'
@@ -13,3 +13,4 @@ dotenv.config({
 
 // Loads the workspace root .env
 // This is only needed when the app is launched with pnpm run
+ */

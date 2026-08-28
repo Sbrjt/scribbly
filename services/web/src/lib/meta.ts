@@ -10,6 +10,9 @@ export const geistMono = Geist_Mono({
 export const metadata: Metadata = {
 	title: 'Blog',
 	description: 'A minimalistic blogging platform',
+	icons: {
+		icon: '/favicon.ico',
+	},
 }
 
 export const viewport: Viewport = {

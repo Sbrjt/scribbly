@@ -2,9 +2,9 @@
   "name": "auth",
   "type": "module",
   "scripts": {
-    "build": "tsc && tsc-alias",
+    "build": "tsdown -c ../../tsdown.config.mjs",
     "dev": "tsx watch src/index.ts",
-    "start": "node dist/index.js"
+    "start": "node .dist/index.mjs"
   },
   "packageManager": "pnpm@10.33.2",
   "dependencies": {

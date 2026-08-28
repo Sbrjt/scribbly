@@ -1,0 +1,45 @@
+name: Terraform Deploy
+
+on:
+  push:
+    branches: [main]
+    paths: '.infra/**'
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./.infra
+    env:
+      TF_VAR_aws_region: ${{ vars.AWS_REGION}}
+      TF_VAR_mq_username: ${{ secrets.MQ_USERNAME }}
+      TF_VAR_mq_password: ${{ secrets.MQ_PASSWORD }}
+      TF_VAR_pg_username: ${{ secrets.PG_USERNAME }}
+      TF_VAR_pg_password: ${{ secrets.PG_PASSWORD }}
+      TF_VAR_mongo_username: ${{ secrets.MONGO_USERNAME }}
+      TF_VAR_mongo_password: ${{ secrets.MONGO_PASSWORD }}
+      TF_VAR_jwt_secret: ${{ secrets.JWT_SECRET }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION  }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve

@@ -53,6 +53,25 @@ export const registerSwagger = async (app: FastifyInstance, prefix: string) => {
 	})
 }
 
+// https://stackoverflow.com/questions/69392033
+export function registerJsonParser(app: FastifyInstance) {
+	app.addContentTypeParser(
+		['application/json', '*'],
+		{ parseAs: 'string' },
+		async (req, body) => {
+			if (body.length === 0) {
+				return undefined
+			}
+
+			try {
+				return JSON.parse(body)
+			} catch {
+				return body
+			}
+		},
+	)
+}
+
 export async function errorHandle(app: FastifyInstance) {
 	app.setErrorHandler((err: any, req, res) => {
 		if (err?.statusCode == 500) {

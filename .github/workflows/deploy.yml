@@ -1,0 +1,134 @@
+name: Deploy Services
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "services/**"
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+
+    outputs:
+      services: ${{ steps.filter.outputs.changes }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Detect changed services
+        uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            auth:
+              - 'services/auth/**'
+
+            user:
+              - 'services/user/**'
+
+            post:
+              - 'services/post/**'
+
+            web:
+              - 'services/web/**'
+
+  deploy:
+    needs: changes
+
+    if: ${{ needs.changes.outputs.services != '[]' }}
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - service: auth
+            image: auth-service
+            ecs_service: scribbly-auth
+            path: services/auth
+            dockerfile: services/auth/Dockerfile.prod
+
+          - service: user
+            image: user-service
+            ecs_service: scribbly-user
+            path: services/user
+            dockerfile: services/user/Dockerfile.prod
+
+          - service: post
+            image: post-service
+            ecs_service: scribbly-post
+            path: services/post
+            dockerfile: services/post/Dockerfile.prod
+
+          - service: web
+            image: web
+            ecs_service: scribbly-web
+            path: services/web
+            dockerfile: services/web/Dockerfile.prod
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check service
+        id: service
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          elif echo '${{ needs.changes.outputs.services }}' | jq -e --arg service "${{ matrix.service }}" 'index($service)' > /dev/null; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Configure AWS credentials
+        if: steps.service.outputs.changed == 'true'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION || 'ap-south-1' }}
+
+      - name: Login to ECR
+        if: steps.service.outputs.changed == 'true'
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push
+        if: steps.service.outputs.changed == 'true'
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          PROJECT: scribbly
+          IMAGE_NAME: ${{ matrix.image }}
+          SHA: ${{ github.sha }}
+        run: |
+          BUILD_ARGS=""
+          if [ "${{ matrix.service }}" = "web" ]; then
+            BUILD_ARGS="--build-arg NEXT_PUBLIC_BASE_URL=${{ vars.NEXT_PUBLIC_BASE_URL }}"
+          fi
+
+          docker build \
+            $BUILD_ARGS \
+            -t "$REGISTRY/$PROJECT/$IMAGE_NAME:$SHA" \
+            -t "$REGISTRY/$PROJECT/$IMAGE_NAME:latest" \
+            -f "${{ matrix.dockerfile }}" \
+            .
+
+          docker push "$REGISTRY/$PROJECT/$IMAGE_NAME:$SHA"
+          docker push "$REGISTRY/$PROJECT/$IMAGE_NAME:latest"
+
+      - name: Redeploy ECS Service
+        if: steps.service.outputs.changed == 'true'
+        run: |
+          aws ecs update-service \
+            --cluster scribbly-cluster \
+            --service ${{ matrix.ecs_service }} \
+            --force-new-deployment

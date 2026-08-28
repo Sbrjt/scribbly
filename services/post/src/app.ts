@@ -6,6 +6,7 @@ import {
 	errorHandle,
 	pinoLogger as logger,
 	myLogger,
+	registerJsonParser,
 	registerSwagger,
 	useTokens,
 } from '@app/common'
@@ -17,10 +18,14 @@ const { JWT_SECRET } = config
 
 await connectToDatabase()
 
-export const app = Fastify({ ...logger, ignoreTrailingSlash: true })
+export const app = Fastify({
+	...logger,
+	routerOptions: { ignoreTrailingSlash: true },
+})
 
 // middlewares
 await registerSwagger(app, '/api/post')
+registerJsonParser(app)
 await useTokens(app, JWT_SECRET)
 await errorHandle(app)
 app.addHook('onResponse', myLogger)

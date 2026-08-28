@@ -1,4 +1,3 @@
-import '@app/common/src/config'
 import ms, { StringValue } from 'ms'
 import { z } from 'zod'
 
@@ -14,9 +13,7 @@ const schema = z.object({
 	PG_PORT: z.coerce.number(),
 	PG_USER: z.string().nonempty(),
 	PG_PASSWORD: z.string().nonempty(),
-	RABBITMQ_USER: z.string().nonempty(),
-	RABBITMQ_PASSWORD: z.string().nonempty(),
-	RABBITMQ_PORT: z.coerce.number(),
+	RABBITMQ_URI: z.string(),
 	REDIS_PORT: z.coerce.number(),
 	REDIS_HOST: z.string().nonempty(),
 	NODE_ENV: z.enum(['development', 'production']),

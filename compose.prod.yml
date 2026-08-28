@@ -1,73 +1,55 @@
+name: scribbly-prod
+
 services:
   auth-service:
-    volumes:
-      - .:/app
-      - /app/node_modules
-      - /app/services/auth/node_modules
-      - /app/packages/common/node_modules
     build:
       context: .
-      dockerfile: ./services/auth/Dockerfile
+      dockerfile: ./services/auth/Dockerfile.prod
     depends_on:
       pg-db:
         condition: service_started
       rabbitmq:
         condition: service_healthy
     ports:
-      - "${AUTH_SERVICE_PORT}:4000"
+      - '${AUTH_SERVICE_PORT}:4000'
     env_file:
       - .env
 
   user-service:
-    volumes:
-      - .:/app
-      - /app/node_modules
-      - /app/services/user/node_modules
-      - /app/packages/common/node_modules
     build:
       context: .
-      dockerfile: ./services/user/Dockerfile
+      dockerfile: ./services/user/Dockerfile.prod
     depends_on:
       pg-db:
         condition: service_started
       rabbitmq:
         condition: service_healthy
     ports:
-      - "${USER_SERVICE_PORT}:4001"
+      - '${USER_SERVICE_PORT}:4001'
     env_file:
       - .env
 
   post-service:
-    env_file:
-      - .env
-    ports:
-      - "${POST_SERVICE_PORT}:4002"
-    volumes:
-      - .:/app
-      - /app/node_modules
-      - /app/services/post/node_modules
-      - /app/packages/common/node_modules
     build:
       context: .
-      dockerfile: ./services/post/Dockerfile
+      dockerfile: ./services/post/Dockerfile.prod
     depends_on:
       - mongo-db
-
-  web:
+    ports:
+      - '${POST_SERVICE_PORT}:4002'
     env_file:
       - .env
-    environment:
-      - NEXT_PUBLIC_BASE_URL=${NEXT_PUBLIC_BASE_URL}
-    ports:
-      - "${WEB_PORT}:3000"
-    volumes:
-      - .:/app
-      - /app/node_modules
-      - /app/services/web/node_modules
-      - /app/packages/common/node_modules
+
+  web:
     build:
       context: .
-      dockerfile: ./services/web/Dockerfile
+      dockerfile: ./services/web/Dockerfile.prod
+      args:
+        NEXT_PUBLIC_BASE_URL: ${NEXT_PUBLIC_BASE_URL}
+    ports:
+      - '${WEB_PORT}:3000'
+    env_file:
+      - .env
 
   pg-db:
     image: postgres:alpine
@@ -76,8 +58,9 @@ services:
       POSTGRES_PASSWORD: ${PG_PASSWORD}
     volumes:
       - postgres-data:/var/lib/postgresql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     ports:
-      - "${PG_PORT}:5432"
+      - '${PG_PORT}:5432'
 
   rabbitmq:
     image: rabbitmq:management
@@ -85,30 +68,33 @@ services:
       RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-guest}
       RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-guest}
     ports:
-      - "${RABBITMQ_PORT}:5672"
-      - "${RABBITMQ_MGMT_PORT}:15672"
+      - '${RABBITMQ_PORT}:5672'
+      - '${RABBITMQ_MGMT_PORT}:15672'
     healthcheck:
-      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      test: ['CMD', 'rabbitmq-diagnostics', '-q', 'ping']
 
   mongo-db:
-    image: mongo # no alpine image 🙁
+    image: mongo
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
     ports:
-      - "${MONGO_PORT}:27017"
+      - '${MONGO_PORT}:27017'
     volumes:
       - mongo-data:/data/db
 
   redis:
     image: redis:alpine
     ports:
-      - "${REDIS_PORT}:6379"
+      - '${REDIS_PORT}:6379'
     volumes:
       - redis-data:/data
     command: redis-server --appendonly yes
 
   nginx:
+    build:
+      context: .
+      dockerfile: ./services/nginx/Dockerfile
     env_file:
       - .env
     environment:
@@ -116,14 +102,11 @@ services:
     volumes:
       - ./services/nginx:/etc/nginx/templates:ro
     ports:
-      - "80:80"
+      - '80:80'
     depends_on:
       - auth-service
       - user-service
       - post-service
-    build:
-      context: .
-      dockerfile: ./services/nginx/Dockerfile
 
 volumes:
   postgres-data:

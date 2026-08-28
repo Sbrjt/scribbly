@@ -24,7 +24,7 @@ export default function DashboardPage() {
 				<PostsTable posts={posts} onDelete={handleDelete} />
 			:	<div className='border rounded-lg border-dashed py-12 flex flex-col items-center justify-center'>
 					<p className='text-muted-foreground mb-4'>No posts yet</p>
-					<Link href='posts/new'>
+					<Link href='blog/new'>
 						<Button>Create your first post</Button>
 					</Link>
 				</div>

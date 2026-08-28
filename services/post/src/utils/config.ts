@@ -1,4 +1,3 @@
-import '@app/common/src/config'
 import { z } from 'zod'
 
 const schema = z.object({
@@ -11,9 +10,7 @@ const schema = z.object({
 	MONGO_USERNAME: z.string().nonempty(),
 	MONGO_PASSWORD: z.string().nonempty(),
 	MONGO_PORT: z.coerce.number(),
-	RABBITMQ_USER: z.string().nonempty(),
-	RABBITMQ_PASSWORD: z.string().nonempty(),
-	RABBITMQ_PORT: z.coerce.number(),
+	RABBITMQ_URI: z.string().default('amqp://guest:guest@localhost:5672'),
 	NODE_ENV: z.enum(['development', 'production']),
 })
 

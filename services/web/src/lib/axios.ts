@@ -4,7 +4,7 @@ import axios from 'axios'
 let accessToken: string | null = null
 
 export const api = axios.create({
-	baseURL: process.env.NEXT_PUBLIC_BASE_URL + 'api',
+	baseURL: '/api',
 	headers: { 'Content-Type': 'application/json' },
 })
 

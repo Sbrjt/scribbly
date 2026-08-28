@@ -1,5 +1,7 @@
-import '@app/common/src/config'
+import dotenv from 'dotenv'
 import { z } from 'zod'
+
+dotenv.config({ quiet: true })
 
 const schema = z.object({
 	JWT_SECRET: z.string().min(32),
@@ -9,9 +11,7 @@ const schema = z.object({
 	PG_PORT: z.coerce.number(),
 	PG_USER: z.string().nonempty(),
 	PG_PASSWORD: z.string().nonempty(),
-	RABBITMQ_USER: z.string().nonempty(),
-	RABBITMQ_PASSWORD: z.string().nonempty(),
-	RABBITMQ_PORT: z.coerce.number(),
+	RABBITMQ_URI: z.string(),
 	NODE_ENV: z.enum(['development', 'production']),
 })
 

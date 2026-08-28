@@ -7,3 +7,4 @@ ignoredBuiltDependencies:
   - unrs-resolver
 trustLockfile: true
 dangerouslyAllowAllBuilds: true
+injectWorkspacePackages: true
